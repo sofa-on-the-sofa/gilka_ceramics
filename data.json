@@ -1,0 +1,13 @@
+{
+  "updated": "2026-09-26",
+  "instagram": "gilka.ceramics",
+  "dropLabel": "Дроп — вересень 2026",
+  "items": [
+    { "code": "PL_1", "name": "Піала 1", "type": "piala", "volume": 70, "price": 800, "status": "available", "order": 6, "duration": 21 },
+    { "code": "PL_2", "name": "Піала 2", "type": "piala", "volume": 100, "price": 1000, "status": "available", "order": 5, "duration": 23 },
+    { "code": "PL_3", "name": "Піала 3", "type": "piala", "volume": 100, "price": 1000, "status": "available", "order": 4, "duration": 24 },
+    { "code": "CH_1", "name": "Чахе 1", "type": "chakhe", "volume": null, "price": 900, "status": "available", "order": 3, "duration": 24 },
+    { "code": "CH_2", "name": "Чахе 2", "type": "chakhe", "volume": null, "price": 1000, "status": "available", "order": 2, "duration": 28 },
+    { "code": "FG_1", "name": "Фігурка 1", "type": "figurka", "volume": null, "price": 700, "status": "available", "order": 1, "duration": 16 }
+  ]
+}

@@ -1,0 +1,18 @@
+Fonts used by this site
+=======================
+
+Both families are licensed under the SIL Open Font License, Version 1.1 (OFL-1.1),
+which permits free use, modification and redistribution (including self-hosting).
+
+1. Lora
+   Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyrillic)
+   https://fonts.google.com/specimen/Lora
+
+2. Golos Text
+   Copyright 2019 The Golos Text Project Authors (https://github.com/googlefonts/golos-text)
+   https://fonts.google.com/specimen/Golos+Text
+
+Full license text: https://openfontlicense.org
+
+Files in this directory are the Cyrillic and Latin subsets, downloaded via
+tools/fetch-fonts.py and served locally (no requests to Google at runtime).

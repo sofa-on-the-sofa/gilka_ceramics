@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Гілка — кераміка ручної роботи</title>
+  <meta name="description" content="Кераміка ручної роботи невеликими партіями: піали, чахе, фігурки. Кожен виріб — в одному екземплярі. Тут видно, що є зараз у наявності.">
+  <meta name="theme-color" content="#F3EEE5">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Гілка — кераміка ручної роботи">
+  <meta property="og:description" content="Піали, чахе, фігурки — кожен виріб в одному екземплярі. Дивіться, що є в наявності.">
+  <meta property="og:image" content="media/PL_2.jpg">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="styles.css?v=5">
+</head>
+<body>
+
+<a class="skip-link" href="#catalog">Перейти до каталогу</a>
+
+<header class="site-head">
+  <div class="head-inner">
+    <a class="wordmark" href="./">Гілка</a>
+    <a class="ig-link" href="https://instagram.com/gilka.ceramics" target="_blank" rel="noopener">@gilka.ceramics</a>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <h1>Піали, чахе, фігурки</h1>
+    <p class="lede">Роблю кераміку невеликими партіями — кожен виріб існує в одному екземплярі. Тут видно, що є зараз.</p>
+    <p class="intro-meta" id="intro-meta"></p>
+  </section>
+
+  <section class="catalog" id="catalog" aria-labelledby="catalog-title">
+    <h2 class="visually-hidden" id="catalog-title">Каталог</h2>
+
+    <div class="controls" id="controls" hidden>
+      <div class="filters" role="group" aria-label="Фільтр за типом виробу">
+        <button type="button" class="filter is-active" data-type="all" aria-pressed="true">Усі<span class="count" data-count="all"></span></button>
+        <button type="button" class="filter" data-type="piala" aria-pressed="false">Піали<span class="count" data-count="piala"></span></button>
+        <button type="button" class="filter" data-type="chakhe" aria-pressed="false">Чахе<span class="count" data-count="chakhe"></span></button>
+        <button type="button" class="filter" data-type="figurka" aria-pressed="false">Фігурки<span class="count" data-count="figurka"></span></button>
+      </div>
+      <div class="controls-aux">
+        <label class="sort">
+          <span class="visually-hidden">Сортування</span>
+          <select id="sort">
+            <option value="new">Нові спочатку</option>
+            <option value="old">Старі спочатку</option>
+            <option value="price-asc">Ціна: від меншої</option>
+            <option value="price-desc">Ціна: від більшої</option>
+          </select>
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="only-available">
+          <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+          <span class="switch-label">Лише в наявності</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="notice" id="notice">Завантажуємо…</div>
+    <div class="grid" id="grid" hidden></div>
+    <div class="empty" id="empty" hidden>
+      <p class="empty-text" id="empty-text"></p>
+      <button type="button" class="text-link" id="reset">Показати все</button>
+    </div>
+    <p class="visually-hidden" id="status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="foot-inner">
+    <p>Оплата — переказ на картку після підтвердження в директі. Доставка — Нова Пошта по Україні.</p>
+    <p><a href="https://instagram.com/gilka.ceramics" target="_blank" rel="noopener">Написати в директ — @gilka.ceramics</a></p>
+    <p class="foot-note">© 2026 Гілка</p>
+  </div>
+</footer>
+
+<noscript>
+  <div class="notice noscript">Для показу каталогу потрібен JavaScript. Напишіть нам у директ: <a href="https://instagram.com/gilka.ceramics">@gilka.ceramics</a></div>
+</noscript>
+
+<script src="app.js?v=3"></script>
+</body>
+</html>
