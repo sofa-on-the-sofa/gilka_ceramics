@@ -15,7 +15,6 @@
   };
 
   const el = {
-    head: document.querySelector('.site-head'),
     introMeta: document.getElementById('intro-meta'),
     controls: document.getElementById('controls'),
     grid: document.getElementById('grid'),
@@ -51,6 +50,11 @@
 
   const PLAY_SVG =
     '<svg viewBox="0 0 8 9" aria-hidden="true"><path d="M0 0l8 4.5L0 9z" fill="currentColor"/></svg>';
+
+  /* стрілка CTA — чиста іконка ↗ (рівні кути, 45°) */
+  const CTA_ARROW =
+    '<svg class="card-cta-arrow" viewBox="0 0 9.5 9.5" width="9.5" height="9.5" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">' +
+    '<path d="M0.75 8.75 L8.75 0.75"/><path d="M4.35 0.75 H8.75 V5.15"/></svg>';
 
   /* ---------- картка ---------- */
 
@@ -122,36 +126,41 @@
     const info = document.createElement('div');
     info.className = 'card-info';
 
+    const row = document.createElement('div');
+    row.className = 'card-row';
+
     const name = document.createElement('h3');
     name.className = 'card-name';
     name.textContent = item.name;
+    row.appendChild(name);
 
-    const meta = document.createElement('p');
-    meta.className = 'card-meta';
     if (item.volume) {
-      meta.appendChild(document.createTextNode(`${item.volume} мл`));
-      const dot = document.createElement('span');
-      dot.className = 'dot';
-      dot.setAttribute('aria-hidden', 'true');
-      dot.textContent = '·';
-      meta.appendChild(dot);
+      const vol = document.createElement('span');
+      vol.className = 'card-vol';
+      vol.textContent = `${item.volume} мл`;
+      row.appendChild(vol);
+    } else {
+      row.classList.add('no-vol');
     }
-    const price = document.createElement('span');
-    price.className = 'price';
-    price.textContent = money(item.price);
-    meta.appendChild(price);
 
-    info.appendChild(name);
-    info.appendChild(meta);
+    const price = document.createElement('span');
+    price.className = 'card-price';
+    price.textContent = money(item.price);
+    row.appendChild(price);
+
+    info.appendChild(row);
 
     if (!sold) {
+      const act = document.createElement('div');
+      act.className = 'card-act';
       const cta = document.createElement('a');
       cta.className = 'card-cta';
       cta.href = igDmUrl(item.name);
       cta.target = '_blank';
       cta.rel = 'noopener';
-      cta.textContent = 'Написати в директ';
-      info.appendChild(cta);
+      cta.innerHTML = 'написати в дірект' + CTA_ARROW;
+      act.appendChild(cta);
+      info.appendChild(act);
     }
 
     card.appendChild(media);
@@ -308,15 +317,10 @@
     render();
   });
 
-  window.addEventListener(
-    'scroll',
-    () => el.head.classList.toggle('is-scrolled', window.scrollY > 8),
-    { passive: true }
-  );
-
   /* ---------- старт ---------- */
 
   const setIntro = (data) => {
+    if (!el.introMeta) return;
     const n = data.items.length;
     const parts = [];
     if (data.dropLabel) parts.push(data.dropLabel);
@@ -339,7 +343,7 @@
     })
     .catch(() => {
       el.notice.innerHTML =
-        'Не вдалося завантажити каталог. Оновіть сторінку — або напишіть у директ: ' +
+        'Не вдалося завантажити каталог. Оновіть сторінку — або напишіть у дірект: ' +
         `<a href="https://instagram.com/${IG}" target="_blank" rel="noopener">@${IG}</a>`;
       el.notice.hidden = false;
     });

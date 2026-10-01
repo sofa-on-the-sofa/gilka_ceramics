@@ -18,6 +18,8 @@
   --font-display: "Lora", Georgia, "Times New Roman", serif;
   --font-text: "Golos Text", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --caps: 0.09em;
+  /* ледь помітне паперове зерно (спільне для body і шапки) */
+  --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @media (min-width: 640px)  { :root { --pad: 32px; } }
@@ -34,8 +36,8 @@ body {
   line-height: 1.55;
   color: var(--ink);
   background-color: var(--bg);
-  /* ледь помітне паперове зерно */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* ледь помітне паперове зерно (той самий шар — у шапки) */
+  background-image: var(--paper);
 }
 
 img, video { display: block; max-width: 100%; }
@@ -74,15 +76,11 @@ a { color: inherit; }
 /* ---------- Шапка ---------- */
 
 .site-head {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: 13px 0;
-  background: var(--bg);
+  padding: 17px 0 9px;
+  background-color: var(--bg);
+  background-image: var(--paper);
   border-bottom: 1px solid transparent;
-  transition: border-color 0.2s ease;
 }
-.site-head.is-scrolled { border-bottom-color: var(--line-soft); }
 
 .head-inner {
   display: flex;
@@ -115,25 +113,26 @@ a { color: inherit; }
 /* ---------- Вступ ---------- */
 
 .intro {
+  position: relative;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 34px var(--pad) 4px;
+  padding: 24px var(--pad) 40px;
 }
 
 .intro h1 {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(34px, 9.6vw, 56px);
   line-height: 1.05;
   letter-spacing: -0.015em;
-  max-width: 20ch;
+  max-width: none;
 }
 
 .lede {
-  margin: 0 0 20px;
+  margin: 0;
   font-size: 16.5px;
-  max-width: 46ch;
+  max-width: 448px;
 }
 
 .intro-meta {
@@ -145,8 +144,70 @@ a { color: inherit; }
   color: var(--ink-dim);
 }
 
-@media (min-width: 640px)  { .intro { padding-top: 48px; } }
-@media (min-width: 1080px) { .intro { padding-top: 64px; } }
+@media (min-width: 640px)  { .intro { padding-top: 32px; } }
+@media (min-width: 1080px) { .intro { padding-top: 4px; } }
+
+.intro-badge {
+  display: block;
+  margin: 24px 0 0 auto;
+  width: 98.2px;
+  height: 98.2px;
+  pointer-events: none;
+}
+
+@media (min-width: 1080px) {
+  .intro-badge {
+    position: absolute;
+    top: 67px;
+    right: 35px;
+    margin: 0;
+    width: 130.938px;
+    height: 130.938px;
+    z-index: 1;
+  }
+}
+
+/* ---------- Смуга «як замовити» ---------- */
+/* лінійки верх/низ — на всю ширину; ≥1240 — дві колонки з роздільником
+   і середньою лінійкою справа; менші ширини — стек. */
+
+.order-info {
+  margin: 0 var(--pad) 9px;
+  border: 1px solid var(--ink);
+}
+
+.order-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+
+.order-text,
+.order-pay,
+.order-ship {
+  margin: 0;
+  max-width: 640px;
+  font-size: 14px;
+}
+
+.order-text { padding: 22px var(--pad); }
+.order-pay  { padding: 22px var(--pad); border-top: 1px solid var(--ink); }
+.order-ship { padding: 22px var(--pad); border-top: 1px solid var(--ink); }
+
+.order-rule { display: none; }
+
+.order-info b { font-weight: 700; }
+
+@media (min-width: 1240px) {
+  .order-info { max-width: calc(1240px - 2 * var(--pad)); margin: 0 auto 9px; }
+  .order-grid {
+    grid-template-columns: 571px 1fr;
+    grid-template-areas:
+      "text pay"
+      "text rule"
+      "text ship";
+  }
+  .order-text { grid-area: text; max-width: none; padding: 54px 47px 40px 48px; }
+  .order-pay  { grid-area: pay; border-top: 0; border-left: 1px solid var(--ink); padding: 26px 46px 30px 51px; }
+  .order-ship { grid-area: ship; border-top: 0; border-left: 1px solid var(--ink); padding: 26px 46px 30px 51px; }
+  .order-rule { display: block; grid-area: rule; height: 0; border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); }
+}
 
 /* ---------- Керування ---------- */
 
@@ -298,14 +359,20 @@ a { color: inherit; }
 }
 
 /* ---------- Картка ---------- */
+/* «Леджер»: рамка, фото в паспарту, смуга клітинок (назва/обʼєм/ціна),
+   лінійка, CTA-смуга. Значення — з макета «Картка · Нова» (design.pen). */
 
-.card { display: flex; flex-direction: column; }
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ink-dim);
+}
 
 .card-media {
   position: relative;
   display: block;
-  width: 100%;
-  aspect-ratio: 4 / 5;
+  margin: 10px 10px 0;
+  aspect-ratio: 342 / 425;
   overflow: hidden;
   background: var(--bg-soft);
 }
@@ -365,8 +432,8 @@ a { color: inherit; }
   align-items: center;
   gap: 6px;
   padding: 5px 8px 4px;
-  background: rgba(243, 238, 229, 0.92);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -378,14 +445,22 @@ a { color: inherit; }
 .card.media-error .media-hint { display: none; }
 
 .card-info {
-  display: grid;
-  justify-items: start;
-  gap: 7px;
-  padding-top: 14px;
+  margin-top: 10px;
+  border-top: 1px solid var(--ink-dim);
 }
+
+.card-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  min-height: 54px;
+}
+.card-row.no-vol { grid-template-columns: minmax(0, 1fr) auto; }
 
 .card-name {
   margin: 0;
+  display: flex;
+  align-items: center;
+  padding: 8px 10px 8px 8px;
   font-family: var(--font-display);
   font-weight: 500;
   font-size: 20px;
@@ -393,40 +468,55 @@ a { color: inherit; }
   letter-spacing: -0.005em;
 }
 
-.card-meta {
-  margin: 0;
+.card-vol,
+.card-price {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 6px;
+  align-items: center;
+  justify-content: center;
   font-size: 13.5px;
-  color: var(--ink-soft);
+  color: var(--ink);
+  white-space: nowrap;
 }
-.card-meta .price { color: var(--ink); font-weight: 500; }
-.card-meta .dot { color: var(--ink-dim); }
+.card-vol { border-left: 1px solid var(--ink-dim); padding: 0 11px; }
+.card-price { border-left: 1px solid var(--ink-dim); padding: 0 10px; }
+
+.card-act {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  padding-left: 8px;
+  border-top: 1px solid var(--ink-dim);
+}
 
 .card-cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: var(--caps);
-  text-transform: uppercase;
+  padding-right: 5px;
+  font-size: 14px;
   color: var(--accent);
-  text-decoration: underline;
-  text-decoration-color: rgba(147, 87, 39, 0.4);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 5px;
+  text-decoration: none;
 }
-.card-cta:hover {
-  color: var(--accent-deep);
-  text-decoration-color: currentColor;
+.card-cta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 11px;
+  height: 1px;
+  background: currentColor;
+}
+.card-cta:hover { color: var(--accent-deep); }
+.card-cta-arrow {
+  flex: 0 0 auto;
+  margin-left: 9px;
+  transform: translateY(3.5px);
 }
 
 .card.is-sold .card-name,
-.card.is-sold .card-meta,
-.card.is-sold .card-meta .price { color: var(--ink-dim); }
+.card.is-sold .card-vol,
+.card.is-sold .card-price { color: var(--ink-dim); }
 
 /* ---------- Стани ---------- */
 
