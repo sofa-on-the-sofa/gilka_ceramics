@@ -1,29 +1,35 @@
 /* ============================================================
    Гілка — сторінка наявності.
-   Напрям: тихий редакційний мінімалізм (деталі — design-notes.md).
-   Токени перевірені на контраст: tools/contrast-check.py
+   Стиль: Brutalist Console 3 — перенос з макета pen.dev
+   (design-styles.pen, узгоджено 02.10.2026). Токени зібрані з
+   файла макета; значення звірені числами.
    ============================================================ */
 
 :root {
-  --bg: #F3EEE5;
-  --bg-soft: #ECE5D7;
-  --ink: #1C1712;
-  --ink-soft: #5C5348;
-  --ink-dim: #6B6156;
-  --line: rgba(28, 23, 18, 0.18);
-  --line-soft: rgba(28, 23, 18, 0.10);
+  --bg: #F5EFE3;
+  --bg-soft: #ECE5D7;                 /* плейсхолдер під медіа */
+  --ink: #141414;
+  --text: #4A4036;
+  --muted: #5A5146;
+  --olive: #A9A25C;
+  --cream: #F5EFE3;
+  --band-text: #EFE9DC;
   --accent: #935727;
   --accent-deep: #803407;
+  --line: rgba(20, 20, 20, 0.19);
+  --line-soft: rgba(20, 20, 20, 0.12);
+  --band-line: rgba(245, 239, 227, 0.18);
   --pad: 20px;
-  --font-display: "Lora", Georgia, "Times New Roman", serif;
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
   --font-text: "Golos Text", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --caps: 0.09em;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   /* ледь помітне паперове зерно (спільне для body і шапки) */
   --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @media (min-width: 640px)  { :root { --pad: 32px; } }
 @media (min-width: 1080px) { :root { --pad: 48px; } }
+@media (min-width: 1280px) { :root { --pad: 64px; } }
 
 * { box-sizing: border-box; }
 
@@ -33,10 +39,9 @@ body {
   margin: 0;
   font-family: var(--font-text);
   font-size: 16px;
-  line-height: 1.55;
-  color: var(--ink);
+  line-height: 1.45;
+  color: var(--text);
   background-color: var(--bg);
-  /* ледь помітне паперове зерно (той самий шар — у шапки) */
   background-image: var(--paper);
 }
 
@@ -76,154 +81,197 @@ a { color: inherit; }
 /* ---------- Шапка ---------- */
 
 .site-head {
-  padding: 17px 0 9px;
   background-color: var(--bg);
   background-image: var(--paper);
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid var(--line);
 }
 
 .head-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  width: 100%;
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
+  height: 58px;
   padding: 0 var(--pad);
 }
 
-.wordmark {
-  font-family: var(--font-display);
-  font-size: 21px;
+.brand {
+  flex: 0 0 auto;
+  display: block;
+  width: 34px;
+  height: 34px;
+}
+.brand svg { display: block; width: 34px; height: 34px; }
+
+.tape {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.01em;
-  line-height: 1;
-  text-decoration: none;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .ig-link {
+  font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--ink-soft);
+  color: var(--ink);
   text-decoration: none;
-  padding: 10px 0;
+  white-space: nowrap;
 }
 .ig-link:hover { color: var(--accent); }
 
-/* ---------- Вступ ---------- */
+@media (max-width: 639px) {
+  .head-inner { gap: 8px; }
+  /* лента може підтискатися (ellipsis), лінк — недоторканний */
+  .tape { position: static; transform: none; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .ig-link { flex: 0 0 auto; }
+}
+
+/* ---------- Сцена (вступ) ---------- */
 
 .intro {
-  position: relative;
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 24px var(--pad) 40px;
+  padding: 40px var(--pad) 28px;
 }
 
 .intro h1 {
-  margin: 0 0 14px;
+  margin: 0 0 28px;
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(34px, 9.6vw, 56px);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-  max-width: none;
+  font-weight: 700;
+  font-size: clamp(40px, 5.83vw, 84px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--ink);
 }
 
 .lede {
   margin: 0;
-  font-size: 16.5px;
-  max-width: 448px;
+  max-width: 640px;
+  font-size: clamp(17px, 1.39vw, 20px);
+  line-height: 1.2;
+  color: var(--text);
 }
 
-.intro-meta {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: var(--caps);
-  text-transform: uppercase;
-  color: var(--ink-dim);
-}
+.scene { margin: 28px 0 0; }
+.scene img { width: 100%; height: auto; }
 
-@media (min-width: 640px)  { .intro { padding-top: 32px; } }
-@media (min-width: 1080px) { .intro { padding-top: 4px; } }
-
-.intro-badge {
-  display: block;
-  margin: 24px 0 0 auto;
-  width: 98.2px;
-  height: 98.2px;
-  pointer-events: none;
-}
-
-@media (min-width: 1080px) {
-  .intro-badge {
-    position: absolute;
-    top: 67px;
-    right: 35px;
-    margin: 0;
-    width: 130.938px;
-    height: 130.938px;
-    z-index: 1;
+@media (min-width: 900px) {
+  .intro {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 48px;
+    padding-top: 52px;
+    padding-bottom: 30px;
+  }
+  .intro-col { flex: 1 1 auto; min-width: 0; max-width: 640px; }
+  .intro h1 { margin-bottom: 36px; }
+  .scene {
+    flex: 0 1 601px;
+    width: 44%;
+    min-width: 340px;
+    max-width: 601px;
+    margin-top: 0;
   }
 }
 
 /* ---------- Смуга «як замовити» ---------- */
-/* лінійки верх/низ — на всю ширину; ≥1240 — дві колонки з роздільником
-   і середньою лінійкою справа; менші ширини — стек. */
 
 .order-info {
-  margin: 0 var(--pad) 9px;
-  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--band-text);
 }
 
-.order-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.order-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 49px var(--pad);
+  display: grid;
+  gap: 28px;
+}
 
-.order-text,
-.order-pay,
-.order-ship {
+.order-title {
   margin: 0;
-  max-width: 640px;
-  font-size: 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--olive);
 }
 
-.order-text { padding: 22px var(--pad); }
-.order-pay  { padding: 22px var(--pad); border-top: 1px solid var(--ink); }
-.order-ship { padding: 22px var(--pad); border-top: 1px solid var(--ink); }
+.order-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
-.order-rule { display: none; }
+.order-col {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 0 28px;
+  border-left: 1px solid var(--band-line);
+}
+.order-col:first-child {
+  border-left: 0;
+  padding-left: 0;
+  padding-right: 48px;
+}
 
-.order-info b { font-weight: 700; }
+.order-label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--olive);
+}
 
-@media (min-width: 1240px) {
-  .order-info { max-width: calc(1240px - 2 * var(--pad)); margin: 0 auto 9px; }
-  .order-grid {
-    grid-template-columns: 571px 1fr;
-    grid-template-areas:
-      "text pay"
-      "text rule"
-      "text ship";
-  }
-  .order-text { grid-area: text; max-width: none; padding: 54px 47px 40px 48px; }
-  .order-pay  { grid-area: pay; border-top: 0; border-left: 1px solid var(--ink); padding: 26px 46px 30px 51px; }
-  .order-ship { grid-area: ship; border-top: 0; border-left: 1px solid var(--ink); padding: 26px 46px 30px 51px; }
-  .order-rule { display: block; grid-area: rule; height: 0; border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); }
+.order-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--band-text);
+}
+
+@media (max-width: 899px) {
+  .order-inner { padding: 32px var(--pad) 36px; gap: 24px; }
+  .order-grid { grid-template-columns: 1fr; gap: 22px; }
+  .order-col { padding: 22px 0 0; border-left: 0; border-top: 1px solid var(--band-line); }
+  .order-col:first-child { padding: 0; border-top: 0; }
 }
 
 /* ---------- Керування ---------- */
 
-.catalog { max-width: 1240px; margin: 0 auto; }
-
-.controls {
-  display: grid;
-  gap: 12px;
-  padding: 26px var(--pad) 0;
-}
+.controls { border-bottom: 1px solid var(--line); }
 .controls[hidden] { display: none; }
 
+.controls-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  padding: 18px var(--pad);
+}
+
 .filters {
+  flex: 1 1 100%;
   display: flex;
   flex-wrap: nowrap;
-  gap: 22px;
+  align-items: center;
+  gap: 36px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -235,144 +283,104 @@ a { color: inherit; }
 .filter {
   flex: 0 0 auto;
   appearance: none;
-  background: none;
   border: 0;
-  padding: 15px 1px 13px;
-  font-family: var(--font-text);
-  font-size: 12.5px;
+  background: none;
+  padding: 10px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 500;
-  letter-spacing: var(--caps);
+  line-height: 16px;
   text-transform: uppercase;
-  color: var(--ink-dim);
+  color: var(--muted);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 .filter:hover { color: var(--ink); }
+/* активний чип росте навколо тексту (padding компенсується margin),
+   тому при перемиканні тексти й сусіди не зсуваються жодним пікселем */
 .filter.is-active {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--ink);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 6px;
+  padding: 10px 14px;
+  margin: 0 -14px;
+  background: var(--accent);
+  color: var(--cream);
 }
 
-.filter .count {
-  display: inline-block;
-  position: relative;
-  top: -0.45em;
-  margin-left: 3px;
-  font-size: 11px;
-  color: var(--ink-dim);
+.filter[hidden] { display: none; }
+
+.filter .count::before { content: "·"; margin: 0 4px; }
+
+@media (max-width: 639px) {
+  .filters { gap: 20px; }
+  .filter .count::before { content: "·"; margin: 0 1px; }
 }
-.filter.is-active .count { color: var(--accent); }
 
 .controls-aux {
+  flex: 1 1 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--line-soft);
+  gap: 8px 16px;
 }
+
+.sort { display: inline-flex; }
 
 .sort select {
   appearance: none;
   -webkit-appearance: none;
-  min-height: 44px;
   border: 0;
   background-color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 1l3.5 3.5L8 1' fill='none' stroke='%231C1712' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2.5 4.5L6 8l3.5-3.5' fill='none' stroke='%235A5146' stroke-width='1.5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 2px center;
-  padding: 8px 22px 8px 0;
-  font-family: var(--font-text);
-  font-size: 13.5px;
+  background-position: right 0 center;
+  padding: 10px 20px 10px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 500;
-  color: var(--ink);
-  cursor: pointer;
-}
-
-.switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.switch input {
-  position: absolute;
-  opacity: 0;
-  width: 1px; height: 1px;
-}
-.switch-track {
-  flex: 0 0 auto;
-  position: relative;
-  width: 40px; height: 22px;
-  border: 1px solid var(--ink-soft);
-  border-radius: 11px;
-  transition: background-color 0.18s ease, border-color 0.18s ease;
-}
-.switch-knob {
-  position: absolute;
-  top: 2px; left: 2px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: var(--ink);
-  transition: transform 0.18s ease, background-color 0.18s ease;
-}
-.switch input:checked ~ .switch-track {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-.switch input:checked ~ .switch-track .switch-knob {
-  transform: translateX(18px);
-  background: var(--bg);
-}
-.switch input:focus-visible ~ .switch-track {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-.switch-label {
-  font-size: 12.5px;
-  font-weight: 500;
-  letter-spacing: var(--caps);
+  line-height: 16px;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--muted);
+  cursor: pointer;
+}
+.sort select:hover { color: var(--ink); }
+
+
+@media (min-width: 1080px) {
+  .filters { flex: 0 1 auto; margin: 0; padding: 0; overflow: visible; }
+  .controls-aux { flex: 0 0 auto; justify-content: flex-start; }
 }
 
 /* ---------- Сітка ---------- */
 
 .grid {
+  max-width: 1440px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr;
   gap: 44px 20px;
-  padding: 30px var(--pad) 8px;
+  padding: 40px var(--pad);
 }
 .grid[hidden] { display: none; }
 
 @media (min-width: 640px) {
-  .grid { grid-template-columns: repeat(2, 1fr); gap: 52px 24px; padding-top: 36px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 24px; padding-top: 44px; }
 }
 @media (min-width: 1080px) {
-  .grid { grid-template-columns: repeat(3, 1fr); gap: 60px 28px; padding-top: 44px; }
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 44px 28px; padding: 64px var(--pad); }
 }
 
 /* ---------- Картка ---------- */
-/* «Леджер»: рамка, фото в паспарту, смуга клітинок (назва/обʼєм/ціна),
-   лінійка, CTA-смуга. Значення — з макета «Картка · Нова» (design.pen). */
 
 .card {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--ink-dim);
 }
 
 .card-media {
   position: relative;
   display: block;
-  margin: 10px 10px 0;
-  aspect-ratio: 342 / 425;
+  margin: 0;
+  aspect-ratio: 419 / 520;
   overflow: hidden;
   background: var(--bg-soft);
 }
@@ -406,95 +414,131 @@ a { color: inherit; }
 }
 
 .card.is-sold .card-media img.poster {
-  filter: grayscale(1);
-  opacity: 0.55;
+  filter: grayscale(1) brightness(0.6);
 }
 
 .badge {
   position: absolute;
   z-index: 3;
   top: 10px; left: 10px;
-  padding: 5px 8px 4px;
-  background: rgba(243, 238, 229, 0.92);
-  color: var(--ink-dim);
-  font-size: 11px;
+  padding: 4px 8px;
+  background: rgba(245, 239, 227, 0.92);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
   font-weight: 500;
-  letter-spacing: var(--caps);
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 13px;
 }
 
 .media-hint {
   position: absolute;
   z-index: 3;
-  left: 10px; bottom: 10px;
+  left: 16px; bottom: 16px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 8px 4px;
+  padding: 4px 8px;
   background: var(--ink);
-  color: var(--bg);
-  font-size: 11px;
+  color: var(--cream);
+  font-family: var(--font-mono);
+  font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.06em;
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 13px;
   pointer-events: none;
 }
-.media-hint svg { width: 8px; height: 9px; }
+.media-hint svg { flex: 0 0 auto; width: 8px; height: 9px; }
 .card.media-error .media-hint { display: none; }
 
-.card-info {
-  margin-top: 10px;
-  border-top: 1px solid var(--ink-dim);
+/* лінія програвання — перемотка відео */
+.media-seek {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20px;
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
+.media-seek:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.media-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(20, 20, 20, 0.25);
+}
+.media-fill {
+  height: 100%;
+  width: 0;
+  background: var(--ink);
+}
+.card.media-error .media-seek { display: none; }
 
 .card-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  min-height: 54px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 11px 0 0;
 }
-.card-row.no-vol { grid-template-columns: minmax(0, 1fr) auto; }
 
 .card-name {
   margin: 0;
-  display: flex;
-  align-items: center;
-  padding: 8px 10px 8px 8px;
+  flex: 1 1 auto;
+  min-width: 0;
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 1.25;
-  letter-spacing: -0.005em;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--ink);
 }
 
 .card-vol,
 .card-price {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13.5px;
-  color: var(--ink);
+  flex: 0 0 auto;
   white-space: nowrap;
 }
-.card-vol { border-left: 1px solid var(--ink-dim); padding: 0 11px; }
-.card-price { border-left: 1px solid var(--ink-dim); padding: 0 10px; }
+.card-vol {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+.card-price {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+}
 
 .card-act {
   display: flex;
   align-items: center;
-  height: 46px;
-  padding-left: 8px;
-  border-top: 1px solid var(--ink-dim);
+  min-height: 40px;
+  padding: 11px 0 12px;
+  border-top: 1px solid var(--line);
 }
 
 .card-cta {
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding-right: 5px;
-  font-size: 14px;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
   color: var(--accent);
   text-decoration: none;
 }
@@ -503,26 +547,23 @@ a { color: inherit; }
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 11px;
+  bottom: 1px;
   height: 1px;
-  background: currentColor;
+  background: rgba(147, 87, 39, 0.45);
 }
 .card-cta:hover { color: var(--accent-deep); }
-.card-cta-arrow {
-  flex: 0 0 auto;
-  margin-left: 9px;
-  transform: translateY(3.5px);
-}
+.card-cta:hover::after { background: currentColor; }
+.card-cta-arrow { flex: 0 0 auto; }
 
 .card.is-sold .card-name,
 .card.is-sold .card-vol,
-.card.is-sold .card-price { color: var(--ink-dim); }
+.card.is-sold .card-price { color: var(--muted); }
 
 /* ---------- Стани ---------- */
 
 .notice {
   padding: 44px var(--pad) 24px;
-  color: var(--ink-soft);
+  color: var(--muted);
   font-size: 15px;
 }
 .notice a { color: var(--accent); }
@@ -545,15 +586,14 @@ a { color: inherit; }
   border: 0;
   background: none;
   padding: 0;
-  font-family: var(--font-text);
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: var(--caps);
   text-transform: uppercase;
   color: var(--accent);
   cursor: pointer;
   text-decoration: underline;
-  text-decoration-color: rgba(147, 87, 39, 0.4);
+  text-decoration-color: rgba(147, 87, 39, 0.45);
   text-decoration-thickness: 1px;
   text-underline-offset: 5px;
 }
@@ -564,33 +604,24 @@ a { color: inherit; }
 
 /* ---------- Футер ---------- */
 
-.site-foot {
-  margin-top: 84px;
-  border-top: 1px solid var(--line-soft);
-}
+.site-foot { border-top: 1px solid var(--line); }
+
 .foot-inner {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 40px var(--pad) 52px;
-  display: grid;
-  justify-items: start;
-  gap: 10px;
-  font-size: 14px;
-  color: var(--ink-soft);
+  padding: 24px var(--pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
-.foot-inner p { margin: 0; max-width: 52ch; }
-.foot-inner a {
-  color: var(--accent);
-  text-decoration: underline;
-  text-decoration-color: rgba(147, 87, 39, 0.4);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-.foot-inner a:hover { color: var(--accent-deep); text-decoration-color: currentColor; }
-.foot-inner .foot-note {
-  margin-top: 14px;
-  font-size: 12.5px;
-  color: var(--ink-dim);
+.foot-note {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 14px;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* ---------- Рух ---------- */

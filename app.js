@@ -10,7 +10,8 @@
   const state = {
     type: 'all',
     sort: 'new',
-    onlyAvailable: false,
+    showSold: false,
+    dropActive: false,
     items: [],
   };
 
@@ -23,7 +24,6 @@
     emptyText: document.getElementById('empty-text'),
     reset: document.getElementById('reset'),
     sort: document.getElementById('sort'),
-    onlyAvailable: document.getElementById('only-available'),
     status: document.getElementById('status'),
     filters: Array.from(document.querySelectorAll('.filter')),
   };
@@ -53,8 +53,20 @@
 
   /* стрілка CTA — чиста іконка ↗ (рівні кути, 45°) */
   const CTA_ARROW =
-    '<svg class="card-cta-arrow" viewBox="0 0 9.5 9.5" width="9.5" height="9.5" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">' +
+    '<svg class="card-cta-arrow" viewBox="0 0 9.5 9.5" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">' +
     '<path d="M0.75 8.75 L8.75 0.75"/><path d="M4.35 0.75 H8.75 V5.15"/></svg>';
+
+  /* пауза відео, яке зникло з вьюпорта */
+  const mediaObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.intersectionRatio < 0.15) {
+            const v = entry.target.querySelector('video');
+            if (v && !v.paused) v.pause();
+          }
+        }
+      }, { threshold: 0.15 })
+    : null;
 
   /* ---------- картка ---------- */
 
@@ -100,6 +112,7 @@
     media.appendChild(img);
 
     let toggleBtn = null;
+    let seek = null;
     if (!sold) {
       toggleBtn = document.createElement('button');
       toggleBtn.type = 'button';
@@ -107,6 +120,17 @@
       toggleBtn.setAttribute('aria-pressed', 'false');
       toggleBtn.setAttribute('aria-label', `Відтворити відео: ${item.name}`);
       media.appendChild(toggleBtn);
+
+      seek = document.createElement('div');
+      seek.className = 'media-seek';
+      seek.setAttribute('role', 'slider');
+      seek.setAttribute('tabindex', '0');
+      seek.setAttribute('aria-label', `Перемотування відео: ${item.name}`);
+      seek.setAttribute('aria-valuemin', '0');
+      seek.setAttribute('aria-valuemax', String(item.duration || 0));
+      seek.setAttribute('aria-valuenow', '0');
+      seek.innerHTML = '<div class="media-line"><div class="media-fill"></div></div>';
+      media.appendChild(seek);
     }
 
     if (sold) {
@@ -166,13 +190,53 @@
     card.appendChild(media);
     card.appendChild(info);
 
+    if (mediaObserver) mediaObserver.observe(media);
+
     /* відтворення відео */
-    if (!sold && video && toggleBtn) {
+    if (!sold && video && toggleBtn && seek) {
       const labelPlay = `Відтворити відео: ${item.name}`;
       const labelPause = `Пауза: ${item.name}`;
       const hint = media.querySelector('.media-hint');
+      const fill = seek.querySelector('.media-fill');
       const pauseSvg =
         '<svg viewBox="0 0 8 9" aria-hidden="true"><rect x="0" y="0" width="3" height="9" fill="currentColor"/><rect x="5" y="0" width="3" height="9" fill="currentColor"/></svg>';
+
+      /* перемотування: тап/драг по лінії + клавіші */
+      const seekTo = (clientX) => {
+        if (!video.duration) return;
+        const r = seek.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+        video.currentTime = ratio * video.duration;
+      };
+      seek.addEventListener('pointerdown', (e) => {
+        try { seek.setPointerCapture(e.pointerId); } catch (err) {}
+        seekTo(e.clientX);
+      });
+      seek.addEventListener('pointermove', (e) => {
+        if (seek.hasPointerCapture && seek.hasPointerCapture(e.pointerId)) seekTo(e.clientX);
+      });
+      seek.addEventListener('keydown', (e) => {
+        if (!video.duration) return;
+        const step = e.shiftKey ? 10 : 5;
+        if (e.key === 'ArrowRight') { video.currentTime = Math.min(video.duration, video.currentTime + step); e.preventDefault(); }
+        else if (e.key === 'ArrowLeft') { video.currentTime = Math.max(0, video.currentTime - step); e.preventDefault(); }
+        else if (e.key === 'Home') { video.currentTime = 0; e.preventDefault(); }
+        else if (e.key === 'End') { video.currentTime = video.duration; e.preventDefault(); }
+      });
+      video.addEventListener('timeupdate', () => {
+        if (video.duration) fill.style.width = `${(video.currentTime / video.duration) * 100}%`;
+        seek.setAttribute('aria-valuenow', String(Math.round(video.currentTime)));
+      });
+      video.addEventListener('loadedmetadata', () => {
+        if (video.duration) seek.setAttribute('aria-valuemax', String(Math.round(video.duration)));
+      });
+
+      /* одночасно грає лише одне відео */
+      video.addEventListener('play', () => {
+        for (const other of document.querySelectorAll('.card video')) {
+          if (other !== video && !other.paused) other.pause();
+        }
+      });
 
       /* чип у куті: до запуску «▶ відео 0:21», під час — іконка паузи, на паузі — іконка ▶ */
       const paint = () => {
@@ -222,11 +286,15 @@
   const baseItems = () =>
     state.items
       .filter((i) => i.status !== 'hidden')
-      .filter((i) => !state.onlyAvailable || i.status === 'available');
+      .filter((i) => state.showSold || i.status !== 'sold');
 
   const visibleItems = () => {
-    const list = baseItems().filter(
-      (i) => state.type === 'all' || i.type === state.type
+    const list = baseItems().filter((i) =>
+      state.type === 'all'
+        ? true
+        : state.type === 'drop'
+          ? i.drop === true
+          : i.type === state.type
     );
     const sorters = {
       new: (a, b) => b.order - a.order,
@@ -234,14 +302,19 @@
       'price-asc': (a, b) => a.price - b.price,
       'price-desc': (a, b) => b.price - a.price,
     };
-    return list.sort(sorters[state.sort] || sorters.new);
+    const sorted = list.sort(sorters[state.sort] || sorters.new);
+    /* продані — завжди в кінці; у межах групи — обране сортування */
+    return sorted.sort(
+      (a, b) => (a.status === 'sold' ? 1 : 0) - (b.status === 'sold' ? 1 : 0)
+    );
   };
 
   const updateCounts = () => {
     const base = baseItems();
-    const counts = { all: base.length, piala: 0, chakhe: 0, figurka: 0 };
+    const counts = { all: base.length, drop: 0, piala: 0, chakhe: 0, figurka: 0 };
     for (const i of base) {
       if (counts[i.type] !== undefined) counts[i.type] += 1;
+      if (i.drop === true) counts.drop += 1;
     }
     for (const btn of el.filters) {
       const span = btn.querySelector('.count');
@@ -266,20 +339,23 @@
 
   const render = () => {
     const list = visibleItems();
+    if (mediaObserver) mediaObserver.disconnect();
     el.grid.replaceChildren(...list.map(makeCard));
 
     if (list.length === 0) {
       el.grid.hidden = true;
       el.empty.hidden = false;
-      if (state.onlyAvailable && baseItems().length === 0) {
-        el.emptyText.textContent =
-          'Зараз усе продано. Новий дроп анонсую в інстаграмі — заглядайте.';
+      if (state.type === 'drop') {
+        el.emptyText.textContent = 'У цьому дропі зараз нічого немає.';
       } else if (state.type !== 'all') {
         el.emptyText.textContent = 'У цій категорії поки нічого немає.';
+      } else if (!state.showSold && state.items.some((i) => i.status === 'sold')) {
+        el.emptyText.textContent =
+          'Зараз усе продано. Новий дроп анонсую в інстаграмі — заглядайте.';
       } else {
         el.emptyText.textContent = 'За цих умов нічого немає.';
       }
-      el.reset.hidden = !(state.type !== 'all' || state.onlyAvailable);
+      el.reset.hidden = state.type === 'all';
     } else {
       el.empty.hidden = true;
       el.grid.hidden = false;
@@ -304,15 +380,8 @@
     render();
   });
 
-  el.onlyAvailable.addEventListener('change', () => {
-    state.onlyAvailable = el.onlyAvailable.checked;
-    render();
-  });
-
   el.reset.addEventListener('click', () => {
     state.type = 'all';
-    state.onlyAvailable = false;
-    el.onlyAvailable.checked = false;
     updateFilterButtons();
     render();
   });
@@ -334,11 +403,18 @@
       return r.json();
     })
     .then((data) => {
+      state.showSold = data.showSold === true;
       state.items = (data.items || []).filter((i) => i && i.code && i.name);
+      state.dropActive =
+        data.dropActive === true && state.items.some((i) => i.drop === true);
+      const dropBtn = el.filters.find((b) => b.dataset.type === 'drop');
+      if (dropBtn) dropBtn.hidden = !state.dropActive;
+      if (state.dropActive) state.type = 'drop';
       setIntro(data);
       el.notice.hidden = true;
       el.controls.hidden = false;
       el.grid.hidden = false;
+      updateFilterButtons();
       render();
     })
     .catch(() => {
