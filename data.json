@@ -11,7 +11,7 @@
       "type": "piala",
       "volume": 70,
       "price": 800,
-      "status": "available",
+      "status": "sold",
       "order": 6,
       "duration": 21,
       "drop": true
