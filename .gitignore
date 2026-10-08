@@ -1,2 +1,11 @@
 .DS_Store
 *.log
+*.pen
+*.ttf
+*.otf
+*.jpeg
+IMG_*
+color_palette.jpg
+vibe_03.jpg
+exports-styles/
+images/
