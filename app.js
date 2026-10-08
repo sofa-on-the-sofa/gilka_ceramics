@@ -311,16 +311,14 @@
   };
 
   const updateCounts = () => {
-    const unhidden = state.items.filter((i) => i.status !== 'hidden');
-    const available = unhidden.filter((i) => i.status !== 'sold');
+    const available = state.items.filter(
+      (i) => i.status !== 'hidden' && i.status !== 'sold'
+    );
     const counts = { all: available.length, drop: 0, piala: 0, chakhe: 0, figurka: 0 };
     for (const i of available) {
       if (counts[i.type] !== undefined) counts[i.type] += 1;
+      if (i.drop === true) counts.drop += 1;
     }
-    const dropList = unhidden.filter(
-      (i) => i.drop === true && (state.showSold || i.status !== 'sold')
-    );
-    counts.drop = dropList.length;
 
     for (const btn of el.filters) {
       const span = btn.querySelector('.count');
