@@ -64,7 +64,7 @@
       "type": "figurka",
       "volume": null,
       "price": 700,
-      "status": "available",
+      "status": "sold",
       "order": 1,
       "duration": 16,
       "drop": true
