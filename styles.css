@@ -562,6 +562,8 @@ a { color: inherit; }
 /* ---------- Стани ---------- */
 
 .notice {
+  max-width: 1440px;
+  margin: 0 auto;
   padding: 44px var(--pad) 24px;
   color: var(--muted);
   font-size: 15px;
@@ -569,13 +571,19 @@ a { color: inherit; }
 .notice a { color: var(--accent); }
 
 .empty {
-  padding: 52px var(--pad) 24px;
-  max-width: 46ch;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px var(--pad) 24px;
+}
+@media (min-width: 1080px) {
+  .empty { padding: 64px var(--pad) 32px; }
 }
 .empty[hidden] { display: none; }
 .empty-text {
-  margin: 0 0 12px;
+  max-width: 46ch;
+  margin: 0 0 16px;
   font-size: 16px;
+  line-height: 1.5;
 }
 
 .text-link {
