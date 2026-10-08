@@ -283,19 +283,20 @@
 
   /* ---------- фільтр / сортування / рендер ---------- */
 
-  const baseItems = () =>
-    state.items
-      .filter((i) => i.status !== 'hidden')
-      .filter((i) => state.showSold || i.status !== 'sold');
-
   const visibleItems = () => {
-    const list = baseItems().filter((i) =>
-      state.type === 'all'
-        ? true
-        : state.type === 'drop'
-          ? i.drop === true
-          : i.type === state.type
-    );
+    let list = state.items.filter((i) => i.status !== 'hidden');
+    if (state.type === 'drop') {
+      list = list.filter((i) => i.drop === true);
+      if (!state.showSold) {
+        list = list.filter((i) => i.status !== 'sold');
+      }
+    } else {
+      list = list.filter((i) => i.status !== 'sold');
+      if (state.type !== 'all') {
+        list = list.filter((i) => i.type === state.type);
+      }
+    }
+
     const sorters = {
       new: (a, b) => b.order - a.order,
       old: (a, b) => a.order - b.order,
@@ -310,12 +311,17 @@
   };
 
   const updateCounts = () => {
-    const base = baseItems();
-    const counts = { all: base.length, drop: 0, piala: 0, chakhe: 0, figurka: 0 };
-    for (const i of base) {
+    const unhidden = state.items.filter((i) => i.status !== 'hidden');
+    const available = unhidden.filter((i) => i.status !== 'sold');
+    const counts = { all: available.length, drop: 0, piala: 0, chakhe: 0, figurka: 0 };
+    for (const i of available) {
       if (counts[i.type] !== undefined) counts[i.type] += 1;
-      if (i.drop === true) counts.drop += 1;
     }
+    const dropList = unhidden.filter(
+      (i) => i.drop === true && (state.showSold || i.status !== 'sold')
+    );
+    counts.drop = dropList.length;
+
     for (const btn of el.filters) {
       const span = btn.querySelector('.count');
       if (span) span.textContent = counts[btn.dataset.type] ?? '';
