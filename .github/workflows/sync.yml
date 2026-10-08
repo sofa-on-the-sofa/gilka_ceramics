@@ -1,0 +1,43 @@
+name: Sync Catalog from Google Sheets
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run sync script
+        run: python3 scripts/sync-sheets.py
+
+      - name: Keepalive pulse (prevent GitHub Actions 60-day inactivity sleep)
+        run: |
+          # If today is 1st of month, update keepalive timestamp
+          if [ "$(date +%d)" = "01" ]; then
+            date -u +"%Y-%m-%dT%H:%M:%SZ" > .keepalive
+          fi
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json .keepalive
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Sync catalog from Google Sheets"
+            git push
+          else
+            echo "No changes to commit."
+          fi
