@@ -350,9 +350,9 @@
       el.grid.hidden = true;
       el.empty.hidden = false;
       if (state.type === 'drop') {
-        el.emptyText.textContent = 'У цьому дропі зараз нічого немає.';
+        el.emptyText.textContent = 'Усі вироби з цього дропу вже розібрали.';
       } else if (state.type !== 'all') {
-        el.emptyText.textContent = 'У цій категорії поки нічого немає.';
+        el.emptyText.textContent = 'Усі вироби в цій категорії вже розібрали.';
       } else if (!state.showSold && state.items.some((i) => i.status === 'sold')) {
         el.emptyText.textContent =
           'Зараз усе продано. Новий дроп анонсую в інстаграмі — заглядайте.';
