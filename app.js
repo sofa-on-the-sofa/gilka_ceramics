@@ -226,10 +226,10 @@
 
     info.appendChild(row);
 
-    const act = document.createElement('div');
-    act.className = 'card-act';
-
     if (!sold) {
+      const act = document.createElement('div');
+      act.className = 'card-act';
+
       const cta = document.createElement('a');
       cta.className = 'card-cta';
       cta.href = igDmUrl(item);
@@ -241,29 +241,29 @@
         showToast('Скопійовано — вставте в чат');
       });
       act.appendChild(cta);
+
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'card-copy-link';
+      copyBtn.textContent = 'скопіювати посилання на виріб';
+      copyBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        copyText(getItemUrl(item.code));
+        showToast('Посилання скопійовано');
+        if (history.replaceState) {
+          history.replaceState(null, '', '#' + item.code);
+        } else {
+          window.location.hash = item.code;
+        }
+        card.classList.remove('is-targeted');
+        void card.offsetWidth;
+        card.classList.add('is-targeted');
+        setTimeout(() => card.classList.remove('is-targeted'), 2600);
+      });
+      act.appendChild(copyBtn);
+
+      info.appendChild(act);
     }
-
-    const copyBtn = document.createElement('button');
-    copyBtn.type = 'button';
-    copyBtn.className = 'card-copy-link';
-    copyBtn.textContent = 'скопіювати посилання на виріб';
-    copyBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      copyText(getItemUrl(item.code));
-      showToast('Посилання скопійовано');
-      if (history.replaceState) {
-        history.replaceState(null, '', '#' + item.code);
-      } else {
-        window.location.hash = item.code;
-      }
-      card.classList.remove('is-targeted');
-      void card.offsetWidth;
-      card.classList.add('is-targeted');
-      setTimeout(() => card.classList.remove('is-targeted'), 2600);
-    });
-    act.appendChild(copyBtn);
-
-    info.appendChild(act);
 
     card.appendChild(media);
     card.appendChild(info);
