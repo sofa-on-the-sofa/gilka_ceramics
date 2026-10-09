@@ -25,6 +25,7 @@
     reset: document.getElementById('reset'),
     sort: document.getElementById('sort'),
     status: document.getElementById('status'),
+    toast: document.getElementById('toast'),
     filters: Array.from(document.querySelectorAll('.filter')),
   };
 
@@ -45,8 +46,58 @@
     return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
   };
 
-  const igDmUrl = (name) =>
-    `https://ig.me/m/${IG}?text=${encodeURIComponent(`Добрий день! Цікавить «${name}».`)}`;
+  const getItemUrl = (code) => {
+    const url = new URL(window.location.href);
+    url.search = '';
+    url.hash = code;
+    return url.href;
+  };
+
+  const igDmUrl = (item) => {
+    const text = `${item.name} (${getItemUrl(item.code)})`;
+    return `https://ig.me/m/${IG}?text=${encodeURIComponent(text)}`;
+  };
+
+  const copyText = async (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {}
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '-9999px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch (err) {}
+    ta.remove();
+    return ok;
+  };
+
+  let toastTimer = null;
+  const showToast = (message) => {
+    if (!el.toast) return;
+    el.toast.textContent = message;
+    el.toast.hidden = false;
+    requestAnimationFrame(() => {
+      el.toast.classList.add('is-visible');
+    });
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      el.toast.classList.remove('is-visible');
+      setTimeout(() => {
+        if (!el.toast.classList.contains('is-visible')) el.toast.hidden = true;
+      }, 250);
+    }, 2400);
+  };
 
   const PLAY_SVG =
     '<svg viewBox="0 0 8 9" aria-hidden="true"><path d="M0 0l8 4.5L0 9z" fill="currentColor"/></svg>';
@@ -74,6 +125,7 @@
     const sold = item.status === 'sold';
     const card = document.createElement('article');
     card.className = sold ? 'card is-sold' : 'card';
+    card.id = item.code;
 
     /* медіа: відео знизу, постер-картинка зверху, тапи приймає прозора кнопка-оверлей.
        (iOS Safari не програє відео, що лежить під шаром, і не віддає тапи по самому відео) */
@@ -174,18 +226,44 @@
 
     info.appendChild(row);
 
+    const act = document.createElement('div');
+    act.className = 'card-act';
+
     if (!sold) {
-      const act = document.createElement('div');
-      act.className = 'card-act';
       const cta = document.createElement('a');
       cta.className = 'card-cta';
-      cta.href = igDmUrl(item.name);
+      cta.href = igDmUrl(item);
       cta.target = '_blank';
       cta.rel = 'noopener';
       cta.innerHTML = 'написати в дірект' + CTA_ARROW;
+      cta.addEventListener('click', () => {
+        copyText(`${item.name} (${getItemUrl(item.code)})`);
+        showToast('Скопійовано — вставте в чат');
+      });
       act.appendChild(cta);
-      info.appendChild(act);
     }
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'card-copy-link';
+    copyBtn.textContent = 'скопіювати посилання на виріб';
+    copyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      copyText(getItemUrl(item.code));
+      showToast('Посилання скопійовано');
+      if (history.replaceState) {
+        history.replaceState(null, '', '#' + item.code);
+      } else {
+        window.location.hash = item.code;
+      }
+      card.classList.remove('is-targeted');
+      void card.offsetWidth;
+      card.classList.add('is-targeted');
+      setTimeout(() => card.classList.remove('is-targeted'), 2600);
+    });
+    act.appendChild(copyBtn);
+
+    info.appendChild(act);
 
     card.appendChild(media);
     card.appendChild(info);
@@ -390,6 +468,37 @@
     render();
   });
 
+  const handleHashNavigation = () => {
+    const raw = window.location.hash.replace(/^#/, '');
+    if (!raw) return;
+    const target = state.items.find(
+      (i) => i.code.toLowerCase() === raw.toLowerCase()
+    );
+    if (!target) return;
+
+    const isVisible = visibleItems().some((i) => i.code === target.code);
+    if (!isVisible) {
+      if (state.type === 'drop' && !target.drop) {
+        state.type = 'all';
+      } else if (state.type !== 'all' && state.type !== target.type) {
+        state.type = 'all';
+      }
+      updateFilterButtons();
+      render();
+    }
+
+    const cardEl = document.getElementById(target.code);
+    if (cardEl) {
+      cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      cardEl.classList.remove('is-targeted');
+      void cardEl.offsetWidth;
+      cardEl.classList.add('is-targeted');
+      setTimeout(() => cardEl.classList.remove('is-targeted'), 2600);
+    }
+  };
+
+  window.addEventListener('hashchange', handleHashNavigation);
+
   /* ---------- старт ---------- */
 
   const setIntro = (data) => {
@@ -420,6 +529,7 @@
       el.grid.hidden = false;
       updateFilterButtons();
       render();
+      requestAnimationFrame(handleHashNavigation);
     })
     .catch(() => {
       el.notice.innerHTML =
