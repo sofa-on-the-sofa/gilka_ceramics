@@ -31,13 +31,17 @@ function onCatalogEdit(e) {
   const numCols = sheet.getLastColumn();
   if (range && numCols > 0) {
     const headers = sheet.getRange(1, 1, 1, numCols).getValues()[0];
-    const statusCol = headers.findIndex(h => h.toString().trim().toLowerCase() === 'статус') + 1;
+    const statusCol = headers.findIndex(h => {
+      const name = h.toString().trim().toLowerCase();
+      return name === 'наявність' || name === 'статус';
+    }) + 1;
     const dateCol = headers.findIndex(h => h.toString().trim().toLowerCase() === 'дата продажу') + 1;
 
     if (statusCol > 0 && range.getColumn() === statusCol) {
       const row = range.getRow();
-      const val = (range.getValue() || '').toString().trim().toLowerCase();
-      const isSold = ['-', 'продано', 'sold', 'false', '0', 'ні', 'no'].includes(val);
+      const val = range.getValue();
+      const strVal = (val !== null && val !== undefined ? val.toString() : '').trim().toLowerCase();
+      const isSold = val === false || ['false', '-', 'продано', 'sold', '0', 'ні', 'no'].includes(strVal);
 
       if (dateCol > 0) {
         const dateCell = sheet.getRange(row, dateCol);
@@ -47,7 +51,7 @@ function onCatalogEdit(e) {
             dateCell.setValue(today);
           }
         } else {
-          // Якщо статус повернули в наявність (+ тощо) — прибираємо дату продажу
+          // Якщо статус повернули в наявність (галочка стоїть / + тощо) — прибираємо дату продажу
           dateCell.clearContent();
         }
       }

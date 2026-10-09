@@ -79,7 +79,7 @@ def sync(sheet_id=DEFAULT_SHEET_ID):
         raw_type = (row.get("Тип") or "").strip().lower()
         raw_vol = (row.get("Обʼєм (мл)") or row.get("Об'єм (мл)") or row.get("Обєм (мл)") or "").strip()
         raw_price = (row.get("Ціна (грн)") or "").strip()
-        raw_status = (row.get("Статус") or "").strip().lower()
+        raw_status = (row.get("Наявність") or row.get("Статус") or "").strip().lower()
         raw_drop = (row.get("Дроп") or "").strip().lower()
 
         vol = int(raw_vol) if raw_vol.isdigit() else None
