@@ -17,13 +17,28 @@ REPO_ROOT = SCRIPT_DIR.parent
 DATA_JSON_PATH = REPO_ROOT / "data.json"
 
 STATUS_MAP = {
+    # В наявності
     "в наявності": "available",
-    "продано": "sold",
-    "бронь": "reserved",
-    "приховано": "hidden",
+    "+": "available",
+    "1": "available",
+    "true": "available",
+    "так": "available",
+    "yes": "available",
     "available": "available",
+    # Продано
+    "продано": "sold",
+    "-": "sold",
+    "0": "sold",
+    "false": "sold",
+    "ні": "sold",
+    "no": "sold",
     "sold": "sold",
+    # Бронь
+    "бронь": "reserved",
+    "б": "reserved",
     "reserved": "reserved",
+    # Приховано
+    "приховано": "hidden",
     "hidden": "hidden",
 }
 

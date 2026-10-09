@@ -27,6 +27,33 @@ function onCatalogEdit(e) {
   // Ігноруємо шапку (рядок 1)
   if (range && range.getRow() === 1) return;
 
+  // Автопроставляння дати при зміні статусу на продано
+  const numCols = sheet.getLastColumn();
+  if (range && numCols > 0) {
+    const headers = sheet.getRange(1, 1, 1, numCols).getValues()[0];
+    const statusCol = headers.findIndex(h => h.toString().trim().toLowerCase() === 'статус') + 1;
+    const dateCol = headers.findIndex(h => h.toString().trim().toLowerCase() === 'дата продажу') + 1;
+
+    if (statusCol > 0 && range.getColumn() === statusCol) {
+      const row = range.getRow();
+      const val = (range.getValue() || '').toString().trim().toLowerCase();
+      const isSold = ['-', 'продано', 'sold', 'false', '0', 'ні', 'no'].includes(val);
+
+      if (dateCol > 0) {
+        const dateCell = sheet.getRange(row, dateCol);
+        if (isSold) {
+          if (!dateCell.getValue()) {
+            const today = Utilities.formatDate(new Date(), 'Europe/Kyiv', 'dd.MM.yyyy');
+            dateCell.setValue(today);
+          }
+        } else {
+          // Якщо статус повернули в наявність (+ тощо) — прибираємо дату продажу
+          dateCell.clearContent();
+        }
+      }
+    }
+  }
+
   // Захист від частих викликів: не частіше разу на 10 секунд
   const cache = CacheService.getScriptCache();
   if (cache.get('sync_lock')) return;
